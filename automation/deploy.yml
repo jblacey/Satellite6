@@ -1,11 +1,120 @@
 ---
-# Simple playbook to push out some files on new systems
+# deploy.yml
+# Create the ansible user and push out the files for use with ansible.
+# Written by: Justin Lacey
+# Date: 4/30/2018
+# Version: 1.0
 
 - name: deploy.yml
+  gather_facts: false
   hosts: all
-  become: yes
-  tasks:
+  remote_user: root
+  vars:
+    ansible_name: "ansible"
+    ansible_uid: "10000"
+    ansible_group: "ansible"
+    ansible_gid: "10000"
+    ansible_comment: "Ansible Remote User"
+    ansbile_sh: "/bin/bash"
+    ansible_home: "/home/ansible"
+    ansible_key: "./files/id_rsa.pub') }}"
+    ansible_sudoers: "./files/sudoers"
+    ansible_dst: "/etc/sudoers.d/99999_ansible"
+    ansible_ssh_pass: "{{ password }}"
 
+  tasks:
+    
+# Create ansible group
+    - name: Create ansible group
+      group:
+        name: "{{ ansible_group }}"
+        gid: "{{ ansible_gid }}"
+        state: present
+      tags:
+        - user
+    
+# Create ansible user
+    - name: Create ansible user
+      user:
+        name: "{{ ansible_name }}"
+        comment: "{{ ansible_comment }}"
+        state: present
+        uid: "{{ ansible_uid }}"
+        group: "{{ ansible_group }}" 
+        home: "{{ ansible_home }}"
+        shell: "{{ ansbile_sh }}"
+      tags:
+        - user
+
+# Create sudo access
+# Install sudo, if not installed
+    - name: Make sure sudo exists
+      package:
+        name: "sudo"
+        state: present
+      tags:
+        - sudo
+
+# Create sudoers.d, if doesn't exist
+    - name: Ensure the sudoers.d directory is created
+      file:
+        path: "/etc/sudoers.d"
+        owner: "root"
+        group: "root"
+        mode: "0750"
+        state: directory
+      tags:
+        - sudo
+
+# Create /etc/sudoers file, if doesn't match
+    - name: Push sudoers file down
+      copy:
+        src: "{{ ansible_sudoers }}"
+        dest: "/etc/sudoers"
+        owner: "root"
+        group: "root"
+        mode: "0440"
+      tags:
+        - sudo
+
+# Create /etc/sudoers.d file
+    - name: Push sudoers.d file down
+      copy:
+        content: "{{ ansible_name }} ALL=(ALL) NOPASSWD:ALL"
+        dest: "{{ ansible_dst }}"
+        owner: "root"
+        group: "root"
+        mode: "0440"
+      tags:
+        - sudo
+
+# Create ssh key
+    - name: Create authorized keys
+      authorized_key:
+        user: "{{ ansible_name }}"
+        key: "{{ ansible_key }}"
+        state: present
+      tags:
+        - ssh
+
+# Install package required for selinux
+    - name: Install selinux dependency
+      package:
+        name: "policycoreutils-python"
+        state: latest
+      tags:
+        - ssh
+
+# Create selinux file context
+    - name: Update file content on .ssh, if changed
+      sefcontext:
+        target: '{{ ansible_home }}/.ssh(/.*)?'
+        setype: ssh_home_t
+        state: present
+      tags:
+        - ssh
+
+# Create the inputrc file
     - name: Deploy inputrc.
       copy:
         src: ./files/inputrc
@@ -13,7 +122,11 @@
         owner: root
         group: root
         mode: 0644
+      tags:
+        - files
 
+
+# Create the custom profile scrip
     - name: Deploy custom.sh.
       copy:
         src: ./files/custom.sh
@@ -21,4 +134,9 @@
         owner: root
         group: root
         mode: 0755
+      tags:
+        - files
+
+...
+        
 
