@@ -1,0 +1,24 @@
+---
+# Simple playbook to push out some files on new systems
+
+- name: deploy.yml
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Deploy inputrc.
+      copy:
+        src: ./files/inputrc
+        dest: /etc/inputrc
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Deploy custom.sh.
+      copy:
+        src: ./files/custom.sh
+        dest: /etc/profile.d/custom.sh
+        owner: root
+        group: root
+        mode: 0755
+
