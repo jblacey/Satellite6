@@ -17,7 +17,6 @@
     ansible_comment: "Ansible Remote User"
     ansbile_sh: "/bin/bash"
     ansible_home: "/home/ansible"
-    ansible_key: "./files/id_rsa.pub"
     ansible_sudoers: "./files/sudoers"
     ansible_dst: "/etc/sudoers.d/99999_ansible"
     ansible_ssh_pass: "{{ password }}"
@@ -92,8 +91,10 @@
     - name: Create authorized keys
       authorized_key:
         user: "{{ ansible_name }}"
-        key: "{{ ansible_key }}"
+        key: "{{ item }}" 
         state: present
+      with_file:
+        - files/authorized_keys
       tags:
         - ssh
 
