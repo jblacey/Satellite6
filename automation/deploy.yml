@@ -16,7 +16,6 @@
     ansible_comment: "Ansible Remote User"
     ansbile_sh: "/bin/bash"
     ansible_home: "/home/ansible"
-    ansible_sudoers: "./files/sudoers"
     ansible_dst: "/etc/sudoers.d/99999_ansible"
   tasks:
     
