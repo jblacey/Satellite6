@@ -8,6 +8,7 @@
 - name: deploy.yml
   gather_facts: false
   hosts: all
+  remote_user: "root"
   vars:
     ansible_name: "ansible"
     ansible_uid: "10000"
