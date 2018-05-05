@@ -78,8 +78,6 @@
         user: "{{ ansible_name }}"
         key: "{{ pubkey }}" 
         state: present
-#      with_file:
-#        - "{{ pubkey }}"
       tags:
         - ssh
 
