@@ -8,7 +8,6 @@
 - name: deploy.yml
   gather_facts: false
   hosts: all
-  remote_user: root
   vars:
     ansible_name: "ansible"
     ansible_uid: "10000"
@@ -19,8 +18,6 @@
     ansible_home: "/home/ansible"
     ansible_sudoers: "./files/sudoers"
     ansible_dst: "/etc/sudoers.d/99999_ansible"
-    ansible_ssh_pass: "{{ password }}"
-
   tasks:
     
 # Create ansible group
@@ -65,17 +62,6 @@
       tags:
         - sudo
 
-# Create /etc/sudoers file, if doesn't match
-    - name: Push sudoers file down
-      copy:
-        src: "{{ ansible_sudoers }}"
-        dest: "/etc/sudoers"
-        owner: "root"
-        group: "root"
-        mode: "0440"
-      tags:
-        - sudo
-
 # Create /etc/sudoers.d file
     - name: Push sudoers.d file down
       copy:
@@ -91,10 +77,10 @@
     - name: Create authorized keys
       authorized_key:
         user: "{{ ansible_name }}"
-        key: "{{ item }}" 
+        key: "{{ pubkey }}" 
         state: present
-      with_file:
-        - files/authorized_keys
+#      with_file:
+#        - "{{ pubkey }}"
       tags:
         - ssh
 
