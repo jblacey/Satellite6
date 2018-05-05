@@ -122,6 +122,16 @@
       tags:
         - files
 
+# Install packages
+    - name: Install packages
+      package:
+        name: "{{ item }}"
+        state: latest
+      tags: 
+        - packages 
+      with_items:
+        - vim-enhanced
+
 ...
         
 
