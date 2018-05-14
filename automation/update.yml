@@ -16,8 +16,15 @@
       package:
         name: "*"
         state: latest
+      register: pkgs
       tags:
         - packages
+
+# Display output of pkgs
+    - name: Display output from package update
+      debug:
+        msg: "{{ pkgs }}"
+      when: pkgs is defined
 
 ...
         
