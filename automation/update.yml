@@ -1,0 +1,24 @@
+---
+# update.yml
+# Short playbook that Performs an update of all packages with ansible.
+# Written by: Justin Lacey
+# Date: 4/30/2018
+# Version: 1.0
+
+- name: update.yml
+  gather_facts: false
+  become: yes
+  hosts: all
+  tasks:
+    
+# Update packages using ansible
+    - name:  Update all packages
+      package:
+        name: "*"
+        state: latest
+      tags:
+        - packages
+
+...
+        
+

@@ -3,6 +3,7 @@
 
 - name: insights.yml
   hosts: all
+  gather_facts: false
   become: yes
   vars:
     insights_conf: |
