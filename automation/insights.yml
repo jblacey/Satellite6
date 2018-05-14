@@ -1,0 +1,43 @@
+---
+# Simple Insights install with playbook, no role
+
+- name: insights.yml
+  hosts: all
+  become: yes
+  vars:
+    insights_conf: |
+      [remove]
+      files=/etc/hosts,/etc/resolve.conf
+      commands=netstat
+      #patterns=password,username
+      #keywords=super$ecret,ultra$ecret
+    insights_path: "/etc/insights-client"
+    insights_reg: "insights-client --register"
+    insights_rm: "{{ insights_path }}/remove.conf"
+    insights_rpm: "insights-client"
+    reg_file: "{{ insights_path }}/.registered"
+
+  tasks:
+    - name: Install Insights package.
+      package:
+        name: "{{ insights_rpm }}"
+        state: present
+
+    - name: Create remove.conf.
+      copy:
+        content: "{{ insights_conf }}"
+        dest: "{{ insights_rm }}"
+        owner: "root"
+        group: "root"
+        mode: "0600"
+
+    - name: Verify if registered.
+      stat:
+        path: "{{ reg_file }}" 
+      register: registered
+
+    - name: Register Insights, if not registered.
+      shell: "{{ insights_reg }}"
+      when: registered.stat.exists == false
+
+...
