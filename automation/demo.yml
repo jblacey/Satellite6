@@ -1,1 +1,20 @@
+---
+# demo.yml
+# Run scripts using Ansible 
+# Written by: Justin Lacey
+# Date: 4/30/2018
+# Version: 1.0
 
+- name: demo.yml
+  gather_facts: false
+  hosts: 
+  - node1
+  - node2
+  become: true
+  tasks:
+    
+# Run script1
+  - name: Run Cron_emailAndPurge_1.sh
+    ansible.builtin.script:
+      cmd: /demo/Cron_emailAndPurge_1.sh
+...
